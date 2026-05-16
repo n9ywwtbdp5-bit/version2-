@@ -10,6 +10,7 @@
     "lint": "eslint src --ext .js,.jsx"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^9.5.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.3.19",
     "lucide-react": "^0.383.0",
