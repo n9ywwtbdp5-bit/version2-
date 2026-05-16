@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useStore } from '../store.js'
-import { loadStripe } from '@stripe/stripe-js';
 
 const PLANS = [
   {
@@ -8,7 +7,6 @@ const PLANS = [
     name: 'Free',
     emoji: '🌱',
     price: 0,
-    priceLabel: '$0',
     period: 'forever',
     tagline: 'Get started and build your first habit',
     color: '#6B6B8A',
@@ -33,7 +31,6 @@ const PLANS = [
     name: 'Pro',
     emoji: '⚡',
     price: 16.99,
-    priceLabel: '$16.99',
     period: 'per month',
     tagline: 'For students serious about building habits',
     color: '#FF6B35',
@@ -59,7 +56,6 @@ const PLANS = [
     name: 'Premium',
     emoji: '👑',
     price: 23.99,
-    priceLabel: '$23.99',
     period: 'per month',
     tagline: 'The full arsenal for top performers',
     color: '#9B5DE5',
@@ -82,132 +78,313 @@ const PLANS = [
 ]
 
 const FAQ = [
-  { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel in one click — no questions asked, no hidden fees. Your data stays safe.' },
-  { q: 'Is there a free trial?', a: 'Yes! Pro and Premium both come with a 7-day free trial. No credit card required to start.' },
-  { q: 'What happens to my streak if I cancel?', a: 'Your streak and progress are always preserved. You\'ll drop to Free features, but never lose your data.' },
-  { q: 'Do you offer student discounts?', a: 'Yes! Email us with your .edu address for 30% off any plan.' },
+  {
+    q: 'Can I cancel anytime?',
+    a: 'Absolutely. Cancel anytime with no hidden fees.',
+  },
+  {
+    q: 'Is there a free trial?',
+    a: 'Yes! Pro and Premium include a 7-day free trial.',
+  },
+  {
+    q: 'What happens if I cancel?',
+    a: 'Your progress and streaks remain saved forever.',
+  },
+  {
+    q: 'Do you offer student discounts?',
+    a: 'Yes! Contact support with your .edu email.',
+  },
 ]
 
 export default function Pricing() {
-  const { user, setPlan, closePaywall } = useStore()
+  const { user } = useStore()
+
   const [billing, setBilling] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(null)
 
+  const handleSelect = (plan) => {
+    if (plan === 'free') return
 
-  const stripePromise = loadStripe('pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC');   // ← put your key here (or use env var)
-  const handleSelect = async (plan) => {
-  const stripe = await stripePromise;
+    if (plan === 'pro') {
+      window.open('https://buy.stripe.com/test_14A5kC4rQ2Hj2wE5kk', '_blank')
+      return
+    }
 
-  const priceId = plan === 'pro' 
-    ? 'price_1TXgQPHU1AxqRSaJNNSYsxDc'     // ← your Pro price ID
-    : 'price_1TXgQPHU1AxqRSaJnSB8BtEW';    // ← your Premium price ID
-
-  await stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'subscription',
-    successUrl: `${window.location.origin}/app/dashboard?payment=success`,
-    cancelUrl: `${window.location.origin}/app/pricing`,
-  });
-};
+    if (plan === 'premium') {
+      window.open('https://buy.stripe.com/test_5kA3cu7E2c9R4EOdQQ', '_blank')
+    }
+  }
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: 48, animation: 'slide-up 0.4s ease both' }}>
-        <div style={{ display: 'inline-block', background: 'var(--border)', borderRadius: 99, padding: '6px 20px', fontWeight: 800, fontSize: '0.85rem', color: 'var(--brand-orange)', marginBottom: 16 }}>
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginBottom: 48,
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-block',
+            background: 'var(--border)',
+            borderRadius: 99,
+            padding: '6px 20px',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            color: 'var(--brand-orange)',
+            marginBottom: 16,
+          }}
+        >
           💳 Simple, honest pricing
         </div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.2rem, 5vw, 3.2rem)', marginBottom: 16 }}>
-          Invest in Your <span style={{ color: 'var(--brand-orange)' }}>Future Self 🚀</span>
+
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(2.2rem, 5vw, 3.2rem)',
+            marginBottom: 16,
+          }}
+        >
+          Invest in Your{' '}
+          <span style={{ color: 'var(--brand-orange)' }}>
+            Future Self 🚀
+          </span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', fontWeight: 600, maxWidth: 500, margin: '0 auto 28px' }}>
-          Less than a coffee a week. More valuable than any textbook. Start free, upgrade when you're ready.
+
+        <p
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            maxWidth: 500,
+            margin: '0 auto 28px',
+          }}
+        >
+          Start free. Upgrade when you're ready.
         </p>
 
-        {/* Billing toggle */}
-        <div style={{ display: 'inline-flex', background: 'var(--border)', borderRadius: 99, padding: 4 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            background: 'var(--border)',
+            borderRadius: 99,
+            padding: 4,
+          }}
+        >
           {['monthly', 'annual'].map((b) => (
-            <button key={b} onClick={() => setBilling(b)} style={{
-              padding: '8px 24px', borderRadius: 99,
-              background: billing === b ? 'white' : 'transparent',
-              border: 'none', fontFamily: 'var(--font-body)', fontWeight: 800, fontSize: '0.9rem',
-              color: billing === b ? 'var(--brand-orange)' : 'var(--text-muted)',
-              cursor: 'pointer', boxShadow: billing === b ? 'var(--shadow-sm)' : 'none',
-              transition: 'all 0.2s ease',
-            }}>
-              {b === 'monthly' ? 'Monthly' : '🎁 Annual (Save 20%)'}
+            <button
+              key={b}
+              onClick={() => setBilling(b)}
+              style={{
+                padding: '8px 24px',
+                borderRadius: 99,
+                background: billing === b ? 'white' : 'transparent',
+                border: 'none',
+                fontWeight: 800,
+                cursor: 'pointer',
+              }}
+            >
+              {b === 'monthly'
+                ? 'Monthly'
+                : '🎁 Annual (Save 20%)'}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Plans */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 60 }}>
-        {PLANS.map(({ id, name, emoji, priceLabel, price, period, tagline, color, shadow, badge, features, cta, highlight }) => {
-          const finalPrice = billing === 'annual' && price > 0 ? (price * 0.8).toFixed(2) : price
-          const isCurrent = user.plan === id
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 24,
+          marginBottom: 60,
+        }}
+      >
+        {PLANS.map((plan) => {
+          const finalPrice =
+            billing === 'annual' && plan.price > 0
+              ? (plan.price * 0.8).toFixed(2)
+              : plan.price
+
+          const isCurrent = user.plan === plan.id
+
           return (
-            <div key={id} style={{
-              background: 'white',
-              borderRadius: 'var(--radius-xl)',
-              border: `3px solid ${highlight ? color : 'var(--border)'}`,
-              boxShadow: highlight ? `0 8px 0 ${shadow}, var(--shadow-lg)` : 'var(--shadow-card)',
-              padding: 32,
-              position: 'relative',
-              transform: highlight ? 'scale(1.03)' : 'scale(1)',
-              transition: 'transform 0.2s var(--ease-bounce)',
-            }}>
-              {badge && (
-                <div style={{
-                  position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)',
-                  background: color, color: 'white', borderRadius: 99, padding: '6px 20px',
-                  fontWeight: 900, fontSize: '0.85rem', whiteSpace: 'nowrap',
-                  boxShadow: `0 3px 0 ${shadow}`,
-                }}>{badge}</div>
+            <div
+              key={plan.id}
+              style={{
+                background: 'white',
+                borderRadius: '24px',
+                border: `3px solid ${
+                  plan.highlight
+                    ? plan.color
+                    : 'var(--border)'
+                }`,
+                boxShadow: plan.highlight
+                  ? `0 8px 0 ${plan.shadow}`
+                  : 'var(--shadow-card)',
+                padding: 32,
+                position: 'relative',
+              }}
+            >
+              {plan.badge && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: -16,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: plan.color,
+                    color: 'white',
+                    borderRadius: 99,
+                    padding: '6px 20px',
+                    fontWeight: 900,
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {plan.badge}
+                </div>
               )}
 
-              <div style={{ fontSize: 44, marginBottom: 12 }}>{emoji}</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', color, marginBottom: 4 }}>{name}</div>
-              <div style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.9rem', marginBottom: 20 }}>{tagline}</div>
+              <div
+                style={{
+                  fontSize: 44,
+                  marginBottom: 12,
+                }}
+              >
+                {plan.emoji}
+              </div>
 
-              <div style={{ marginBottom: 28 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '3.2rem', color: 'var(--text-primary)', lineHeight: 1 }}>
-                  {price === 0 ? '$0' : `$${finalPrice}`}
-                </span>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.9rem', marginLeft: 4 }}>/{period}</span>
-                {billing === 'annual' && price > 0 && (
-                  <div style={{ color: 'var(--brand-green)', fontWeight: 800, fontSize: '0.82rem', marginTop: 4 }}>
-                    🎉 Save ${(price * 0.2 * 12).toFixed(2)}/year
-                  </div>
-                )}
+              <div
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.8rem',
+                  color: plan.color,
+                  marginBottom: 4,
+                }}
+              >
+                {plan.name}
+              </div>
+
+              <div
+                style={{
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  marginBottom: 20,
+                }}
+              >
+                {plan.tagline}
               </div>
 
               <div style={{ marginBottom: 28 }}>
-                {features.map((f, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8, opacity: f.startsWith('❌') ? 0.45 : 1 }}>
-                    <span style={{ fontSize: '0.9rem', flexShrink: 0 }}>{f.slice(0, 2)}</span>
-                    <span style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{f.slice(3)}</span>
-                  </div>
-                ))}
+                <span
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '3rem',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {plan.price === 0
+                    ? '$0'
+                    : `$${finalPrice}`}
+                </span>
+
+                <span
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    marginLeft: 4,
+                  }}
+                >
+                  /{plan.period}
+                </span>
+              </div>
+
+              <div style={{ marginBottom: 28 }}>
+                {plan.features.map((feature, i) => {
+                  const enabled =
+                    feature.startsWith('✅')
+
+                  const icon = enabled ? '✅' : '❌'
+
+                  const text = feature
+                    .replace('✅ ', '')
+                    .replace('❌ ', '')
+
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 10,
+                        marginBottom: 10,
+                        opacity: enabled ? 1 : 0.45,
+                      }}
+                    >
+                      <span>{icon}</span>
+
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          fontSize: '0.9rem',
+                          color:
+                            'var(--text-secondary)',
+                          lineHeight: 1.5,
+                          width: '100%',
+                        }}
+                      >
+                        {text}
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
 
               <button
                 className="btn"
-                onClick={() => handleSelect(id)}
+                onClick={() => handleSelect(plan.id)}
                 disabled={isCurrent}
                 style={{
-                  width: '100%', justifyContent: 'center',
-                  background: isCurrent ? 'var(--border)' : highlight ? color : 'white',
-                  color: isCurrent ? 'var(--text-muted)' : highlight ? 'white' : color,
-                  border: `2.5px solid ${isCurrent ? 'var(--border)' : color}`,
-                  boxShadow: isCurrent ? 'none' : `0 4px 0 ${shadow}`,
-                  cursor: isCurrent ? 'default' : 'pointer',
+                  width: '100%',
+                  justifyContent: 'center',
+                  background: isCurrent
+                    ? 'var(--border)'
+                    : plan.highlight
+                    ? plan.color
+                    : 'white',
+                  color: isCurrent
+                    ? 'var(--text-muted)'
+                    : plan.highlight
+                    ? 'white'
+                    : plan.color,
+                  border: `2px solid ${plan.color}`,
+                  padding: '14px 18px',
+                  borderRadius: 14,
+                  fontWeight: 800,
+                  cursor: isCurrent
+                    ? 'default'
+                    : 'pointer',
                   fontSize: '0.95rem',
-                }}>
-                {isCurrent ? '✓ Current Plan' : cta}
+                }}
+              >
+                {isCurrent
+                  ? '✓ Current Plan'
+                  : plan.cta}
               </button>
 
-              {id !== 'free' && (
-                <div style={{ textAlign: 'center', marginTop: 12, color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 700 }}>
+              {plan.id !== 'free' && (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    marginTop: 12,
+                    color: 'var(--text-muted)',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                  }}
+                >
                   7-day free trial · Cancel anytime
                 </div>
               )}
@@ -216,29 +393,112 @@ export default function Pricing() {
         })}
       </div>
 
-      {/* Social proof */}
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <div style={{ color: '#FFD23F', fontSize: '1.8rem', marginBottom: 12, letterSpacing: 4 }}>★★★★★</div>
-        <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-          "StudyStreak Pro literally changed my GPA. I went from a 2.8 to a 3.7 in one semester. Worth every penny."
+      <div
+        style={{
+          textAlign: 'center',
+          marginBottom: 48,
+        }}
+      >
+        <div
+          style={{
+            color: '#FFD23F',
+            fontSize: '1.8rem',
+            marginBottom: 12,
+            letterSpacing: 4,
+          }}
+        >
+          ★★★★★
+        </div>
+
+        <p
+          style={{
+            fontWeight: 700,
+            fontSize: '1.05rem',
+            color: 'var(--text-secondary)',
+            maxWidth: 480,
+            margin: '0 auto',
+            lineHeight: 1.7,
+          }}
+        >
+          "StudyStreak Pro changed my GPA."
         </p>
-        <div style={{ marginTop: 12, fontWeight: 900 }}>— Jake M., Engineering Student</div>
+
+        <div
+          style={{
+            marginTop: 12,
+            fontWeight: 900,
+          }}
+        >
+          — Jake M., Engineering Student
+        </div>
       </div>
 
-      {/* FAQ */}
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', textAlign: 'center', marginBottom: 28 }}>
+      <div
+        style={{
+          maxWidth: 640,
+          margin: '0 auto',
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2rem',
+            textAlign: 'center',
+            marginBottom: 28,
+          }}
+        >
           Got Questions? 🙋
         </h2>
-        {FAQ.map(({ q, a }, i) => (
-          <div key={i} className="card" style={{ padding: '20px 24px', marginBottom: 12, cursor: 'pointer' }} onClick={() => setActiveFaq(activeFaq === i ? null : i)}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>{q}</span>
-              <span style={{ color: 'var(--brand-orange)', fontWeight: 900, fontSize: '1.2rem', transition: 'transform 0.2s', transform: activeFaq === i ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
+
+        {FAQ.map((faq, i) => (
+          <div
+            key={i}
+            className="card"
+            style={{
+              padding: '20px 24px',
+              marginBottom: 12,
+              cursor: 'pointer',
+            }}
+            onClick={() =>
+              setActiveFaq(
+                activeFaq === i ? null : i
+              )
+            }
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: 800,
+                }}
+              >
+                {faq.q}
+              </span>
+
+              <span
+                style={{
+                  color: 'var(--brand-orange)',
+                  fontWeight: 900,
+                }}
+              >
+                {activeFaq === i ? '−' : '+'}
+              </span>
             </div>
+
             {activeFaq === i && (
-              <div style={{ marginTop: 12, color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.7, fontSize: '0.9rem', animation: 'slide-up 0.2s ease' }}>
-                {a}
+              <div
+                style={{
+                  marginTop: 12,
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
+                  lineHeight: 1.7,
+                }}
+              >
+                {faq.a}
               </div>
             )}
           </div>
