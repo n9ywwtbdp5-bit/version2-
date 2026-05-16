@@ -1,105 +1,124 @@
-import React, { useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { useStore } from '../store.js'
+import React, { useState } from "react";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useStore } from "../store.js";
 
 const NAV = [
-  { to: '/app/dashboard', label: 'Home', emoji: '🏠' },
-  { to: '/app/timer', label: 'Study', emoji: '⏱️' },
-  { to: '/app/progress', label: 'Progress', emoji: '📊' },
-  { to: '/app/achievements', label: 'Badges', emoji: '🏆' },
-  { to: '/app/pricing', label: 'Upgrade', emoji: '⚡' },
-]
+  { to: "/app/dashboard", label: "Home", emoji: "🏠" },
+  { to: "/app/timer", label: "Study", emoji: "⏱️" },
+  { to: "/app/progress", label: "Progress", emoji: "📊" },
+  { to: "/app/achievements", label: "Badges", emoji: "🏆" },
+  { to: "/app/pricing", label: "Upgrade", emoji: "⚡" },
+];
 
 export default function Layout() {
-  const { user, currentStreak, xp, level, xpToNextLevel } = useStore()
-  const navigate = useNavigate()
-  const xpPct = Math.min(100, Math.round((xp / xpToNextLevel) * 100))
+  const { user, currentStreak, xp, level, xpToNextLevel } = useStore();
+  const navigate = useNavigate();
+  const xpPct = Math.min(100, Math.round((xp / xpToNextLevel) * 100));
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      {/* Sidebar */}
-      <aside style={{
-        width: 240,
-        background: 'white',
-        borderRight: '2px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '24px 16px',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        flexShrink: 0,
-      }}>
-        {/* Logo */}
-        <button onClick={() => navigate('/')} style={{
-          display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32,
-          background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px',
-          borderRadius: 12, transition: 'background 0.2s',
-        }}>
-          <span style={{ fontSize: 32, animation: 'streak-fire 1.5s ease-in-out infinite' }}>🔥</span>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--brand-orange)', letterSpacing: 1 }}>
-            StudyStreak
-          </span>
-        </button>
+    <div className="min-h-screen bg-primary text-primary">
+      {/* Background Shapes */}
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute left-0 top-0 w-32 h-32 -left-16 -top-16 bg-gradient-to-br from-orange-400/20 to-transparent blur-3xl animate-float-slow delay-100"></div>
+        <div className="absolute right-0 bottom-0 w-24 h-24 -right-12 -bottom-12 bg-gradient-to-tr from-purple-500/20 to-transparent blur-3xl animate-float-slow delay-300"></div>
+        <div className="absolute left-1/2 bottom-1/2 w-48 h-48 -left-24 -bottom-24 bg-gradient-to-bl from-green-400/15 to-transparent blur-3xl animate-float-slow delay-500"></div>
+      </div>
 
-        {/* User Card */}
-        <div className="card" style={{ padding: '16px', marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--brand-orange), var(--brand-yellow))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
-            }}>{user.avatar}</div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{user.name}</div>
-              <div style={{ color: 'var(--brand-purple)', fontWeight: 700, fontSize: '0.8rem' }}>
-                Level {level} ⭐
+      <div className="flex min-h-screen">
+        {/* Sidebar */}
+        <aside className="w-64 bg-secondary/80 backdrop-blur-md border-r border-border/20 flex flex-col p-6">
+          {/* Logo */}
+          <button 
+            onClick={() => navigate("/")} 
+            className="flex items-center gap-3 mb-8 p-2 rounded-lg hover:bg-border/10 transition-colors"
+          >
+            <span className="text-2xl animate-streak-fire">🔥</span>
+            <span className="font-display text-xl text-gradient">StudyStreak</span>
+          </button>
+
+          {/* User Card */}
+          <div className="glass-card p-4 mb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-yellow-400 text-white text-lg">
+                {user.avatar}
+              </div>
+              <div>
+                <div className="font-medium">{user.name}</div>
+                <div className="flex items-center gap-1 text-sm text-muted">
+                  <span className="badge badge-primary">Level {level}</span>
+                  <span className="animate-pulse">⭐</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="w-full">
+              <div className="flex items-center justify-between mb-1 text-xs text-muted">
+                <span>XP Progress</span>
+                <span>{xp} / {xpToNextLevel}</span>
+              </div>
+              <div className="w-full bg-border/20 rounded-full h-1.5 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-orange-400 to-yellow-400 transition-all duration-500" style={{ width: `${xpPct}%` }}></div>
               </div>
             </div>
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 700 }}>
-            {xp} / {xpToNextLevel} XP
+
+          {/* Streak Section */}
+          <div className="glass-card p-4 mb-6 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-3xl animate-streak-fire">🔥</span>
+              <span className="font-display text-xl">{currentStreak}</span>
+              <span className="text-sm text-muted">Day Streak</span>
+            </div>
+            <div className="text-xs text-muted">
+              Best: {user.longestStreak || 0} days
+            </div>
           </div>
-          <div className="xp-bar-container">
-            <div className="xp-bar-fill" style={{ width: `${xpPct}%` }} />
+
+          {/* Nav Links */}
+          <nav className="flex-1 space-y-2">
+            {NAV.map(({ to, label, emoji }) => (
+              <NavLink 
+                key={to} 
+                to={to} 
+                className={({ isActive }) => 
+                  `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${isActive ? 
+                    "glass-card-elevated text-primary hover:-translate-y-1 hover:shadow-md" : 
+                    "text-border hover:text-primary hover:bg-border/10 hover:-translate-y-[1px]"}` 
+                }
+              >
+                <span className="text-xl">{emoji}</span>
+                <span className="font-medium">{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Plan Badge */}
+          <div className="glass-card p-3 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              {user.plan === "free" ? (
+                <span className="text-sm font-medium">🆓 Free Plan</span>
+              ) : user.plan === "pro" ? (
+                <>
+                  <span className="text-sm font-medium">⚡ Pro Plan</span>
+                  <span className="animate-pulse text-xs">•</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-sm font-medium">👑 Premium Plan</span>
+                  <span className="animate-pulse text-xs">•</span>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Streak */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-          <div className="streak-badge">
-            🔥 {currentStreak} Day Streak
-          </div>
-        </div>
-
-        {/* Nav Links */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-          {NAV.map(({ to, label, emoji }) => (
-            <NavLink key={to} to={to} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-              style={{ flexDirection: 'row', justifyContent: 'flex-start', fontSize: '0.95rem' }}>
-              <span style={{ fontSize: 20 }}>{emoji}</span>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Plan badge */}
-        <div style={{
-          background: user.plan === 'free'
-            ? 'var(--border)'
-            : 'linear-gradient(135deg, var(--brand-orange), var(--brand-yellow))',
-          borderRadius: 12, padding: '10px 16px', textAlign: 'center',
-          color: user.plan === 'free' ? 'var(--text-secondary)' : 'white',
-          fontWeight: 800, fontSize: '0.85rem',
-        }}>
-          {user.plan === 'free' ? '🆓 Free Plan' : user.plan === 'pro' ? '⚡ Pro Plan' : '👑 Premium Plan'}
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main style={{ flex: 1, padding: '32px', overflowY: 'auto', maxWidth: 'calc(100vw - 240px)' }}>
-        <Outlet />
-      </main>
+        {/* Main Content */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
-  )
+  );
 }
+'EOF
