@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useStore } from '../store.js'
+import { loadStripe } from '@stripe/stripe-js';
 
 const PLANS = [
   {
@@ -92,11 +93,9 @@ export default function Pricing() {
   const [billing, setBilling] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(null)
 
-import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe('pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC');   // ← put your key here (or use env var)
-
-const handleSelect = async (plan) => {
+  const stripePromise = loadStripe('pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC');   // ← put your key here (or use env var)
+  const handleSelect = async (plan) => {
   const stripe = await stripePromise;
 
   const priceId = plan === 'pro' 
