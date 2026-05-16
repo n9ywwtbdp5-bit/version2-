@@ -125,396 +125,421 @@ export default function Pricing() {
   }
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-      <div
-        style={{
-          textAlign: 'center',
-          marginBottom: 48,
-        }}
-      >
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+      <section className="section">
         <div
           style={{
-            display: 'inline-block',
-            background: 'var(--border)',
-            borderRadius: 99,
-            padding: '6px 20px',
-            fontWeight: 800,
-            fontSize: '0.85rem',
-            color: 'var(--brand-orange)',
-            marginBottom: 16,
+            textAlign: 'center',
+            marginBottom: 48,
           }}
         >
-          💳 Simple, honest pricing
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'var(--bg-tertiary)',
+              borderRadius: '50px',
+              padding: '6px 18px',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              color: 'var(--brand-primary)',
+              marginBottom: 16,
+            }}
+          >
+            💳 Simple, honest pricing
+          </div>
+
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
+              marginBottom: 16,
+              textAlign: 'center',
+              lineHeight: 1.2,
+            }}
+          >
+            Invest in Your{' '}
+            <span style={{ color: 'var(--brand-primary)' }}>
+              Future Self 🚀
+            </span>
+          </h1>
+
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: '1.15rem',
+              fontWeight: 600,
+              maxWidth: 560,
+              margin: '0 auto 28px',
+              lineHeight: 1.7,
+            }}
+          >
+            Start free. Upgrade when you're ready.
+          </p>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              background: 'var(--bg-tertiary)',
+              borderRadius: '50px',
+              padding: 4,
+            }}
+          >
+            {['monthly', 'annual'].map((b) => (
+              <button
+                key={b}
+                onClick={() => setBilling(b)}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '50px',
+                  background: billing === b ? 'var(--bg-card)' : 'transparent',
+                  border: billing === b ? '1px solid var(--brand-primary)' : '1px solid var(--border)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s var(--ease-smooth)',
+                }}
+              >
+                {b === 'monthly'
+                  ? 'Monthly'
+                  : '🎁 Annual (Save 20%)'}
+              </button>
+            ))}
+          </div>
         </div>
-
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.2rem, 5vw, 3.2rem)',
-            marginBottom: 16,
-          }}
-        >
-          Invest in Your{' '}
-          <span style={{ color: 'var(--brand-orange)' }}>
-            Future Self 🚀
-          </span>
-        </h1>
-
-        <p
-          style={{
-            color: 'var(--text-secondary)',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            maxWidth: 500,
-            margin: '0 auto 28px',
-          }}
-        >
-          Start free. Upgrade when you're ready.
-        </p>
 
         <div
           style={{
-            display: 'inline-flex',
-            background: 'var(--border)',
-            borderRadius: 99,
-            padding: 4,
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 24,
+            marginBottom: 60,
           }}
         >
-          {['monthly', 'annual'].map((b) => (
-            <button
-              key={b}
-              onClick={() => setBilling(b)}
-              style={{
-                padding: '8px 24px',
-                borderRadius: 99,
-                background: billing === b ? 'white' : 'transparent',
-                border: 'none',
-                fontWeight: 800,
-                cursor: 'pointer',
-              }}
-            >
-              {b === 'monthly'
-                ? 'Monthly'
-                : '🎁 Annual (Save 20%)'}
-            </button>
-          ))}
-        </div>
-      </div>
+          {PLANS.map((plan) => {
+            const finalPrice =
+              billing === 'annual' && plan.price > 0
+                ? (plan.price * 0.8).toFixed(2)
+                : plan.price
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns:
-            'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 24,
-          marginBottom: 60,
-        }}
-      >
-        {PLANS.map((plan) => {
-          const finalPrice =
-            billing === 'annual' && plan.price > 0
-              ? (plan.price * 0.8).toFixed(2)
-              : plan.price
+            const isCurrent = user.plan === plan.id
 
-          const isCurrent = user.plan === plan.id
+            return (
+              <div
+                key={plan.id}
+                className="glass-card hover-lift"
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  border: plan.highlight 
+                    ? `1px solid ${plan.color}` 
+                    : '1px solid var(--border)',
+                }}
+              >
+                {plan.badge && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: -8,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: plan.color,
+                      color: 'white',
+                      borderRadius: '50px',
+                      padding: '4px 16px',
+                      fontWeight: 900,
+                      fontSize: '0.8rem',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                  >
+                    {plan.badge}
+                  </div>
+                )}
 
-          return (
-            <div
-              key={plan.id}
-              style={{
-                background: 'white',
-                borderRadius: '24px',
-                border: `3px solid ${
-                  plan.highlight
-                    ? plan.color
-                    : 'var(--border)'
-                }`,
-                boxShadow: plan.highlight
-                  ? `0 8px 0 ${plan.shadow}`
-                  : 'var(--shadow-card)',
-                padding: 32,
-                position: 'relative',
-              }}
-            >
-              {plan.badge && (
                 <div
                   style={{
-                    position: 'absolute',
-                    top: -16,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: plan.color,
-                    color: 'white',
-                    borderRadius: 99,
-                    padding: '6px 20px',
-                    fontWeight: 900,
-                    fontSize: '0.85rem',
+                    fontSize: 48,
+                    marginBottom: 16,
+                    textAlign: 'center',
                   }}
                 >
-                  {plan.badge}
+                  {plan.emoji}
                 </div>
-              )}
 
-              <div
-                style={{
-                  fontSize: 44,
-                  marginBottom: 12,
-                }}
-              >
-                {plan.emoji}
-              </div>
-
-              <div
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '1.8rem',
-                  color: plan.color,
-                  marginBottom: 4,
-                }}
-              >
-                {plan.name}
-              </div>
-
-              <div
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                  marginBottom: 20,
-                }}
-              >
-                {plan.tagline}
-              </div>
-
-              <div style={{ marginBottom: 28 }}>
-                <span
+                <div
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '3rem',
-                    color: 'var(--text-primary)',
+                    fontSize: '2rem',
+                    color: plan.color,
+                    textAlign: 'center',
+                    marginBottom: 4,
                   }}
                 >
-                  {plan.price === 0
-                    ? '$0'
-                    : `$${finalPrice}`}
-                </span>
+                  {plan.name}
+                </div>
 
-                <span
-                  style={{
-                    color: 'var(--text-muted)',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    marginLeft: 4,
-                  }}
-                >
-                  /{plan.period}
-                </span>
-              </div>
-
-              <div style={{ marginBottom: 28 }}>
-                {plan.features.map((feature, i) => {
-                  const enabled =
-                    feature.startsWith('✅')
-
-                  const icon = enabled ? '✅' : '❌'
-
-                  const text = feature
-                    .replace('✅ ', '')
-                    .replace('❌ ', '')
-
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 10,
-                        marginBottom: 10,
-                        opacity: enabled ? 1 : 0.45,
-                      }}
-                    >
-                      <span>{icon}</span>
-
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          fontSize: '0.9rem',
-                          color:
-                            'var(--text-secondary)',
-                          lineHeight: 1.5,
-                          width: '100%',
-                        }}
-                      >
-                        {text}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <button
-                className="btn"
-                onClick={() => handleSelect(plan.id)}
-                disabled={isCurrent || Boolean(checkoutPlan)}
-                style={{
-                  width: '100%',
-                  justifyContent: 'center',
-                  background: isCurrent
-                    ? 'var(--border)'
-                    : plan.highlight
-                    ? plan.color
-                    : 'white',
-                  color: isCurrent
-                    ? 'var(--text-muted)'
-                    : plan.highlight
-                    ? 'white'
-                    : plan.color,
-                  border: `2px solid ${plan.color}`,
-                  padding: '14px 18px',
-                  borderRadius: 14,
-                  fontWeight: 800,
-                  cursor: (isCurrent || Boolean(checkoutPlan))
-                    ? 'default'
-                    : 'pointer',
-                  fontSize: '0.95rem',
-                }}
-              >
-                {isCurrent
-                  ? '✓ Current Plan'
-                  : checkoutPlan === plan.id
-                  ? 'Redirecting…'
-                  : plan.cta}
-              </button>
-
-              {plan.id !== 'free' && (
                 <div
                   style={{
-                    textAlign: 'center',
-                    marginTop: 12,
                     color: 'var(--text-muted)',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    textAlign: 'center',
+                    marginBottom: 24,
                   }}
                 >
-                  7-day free trial · Cancel anytime
+                  {plan.tagline}
                 </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
 
-      <div
-        style={{
-          textAlign: 'center',
-          marginBottom: 48,
-        }}
-      >
-        <div
-          style={{
-            color: '#FFD23F',
-            fontSize: '1.8rem',
-            marginBottom: 12,
-            letterSpacing: 4,
-          }}
-        >
-          ★★★★★
-        </div>
+                <div style={{ marginBottom: 28 }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '3.5rem',
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                    }}
+                  >
+                    {plan.price === 0
+                      ? '$0'
+                      : `$${finalPrice}`}
+                  </span>
 
-        <p
-          style={{
-            fontWeight: 700,
-            fontSize: '1.05rem',
-            color: 'var(--text-secondary)',
-            maxWidth: 480,
-            margin: '0 auto',
-            lineHeight: 1.7,
-          }}
-        >
-          "StudyStreak Pro changed my GPA."
-        </p>
+                  <span
+                    style={{
+                      color: 'var(--text-muted)',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      display: 'block',
+                      marginTop: 4,
+                    }}
+                  >
+                    /{plan.period}
+                  </span>
+                </div>
 
-        <div
-          style={{
-            marginTop: 12,
-            fontWeight: 900,
-          }}
-        >
-          — Jake M., Engineering Student
-        </div>
-      </div>
+                <div style={{ marginBottom: 28 }}>
+                  {plan.features.map((feature, i) => {
+                    const enabled =
+                      feature.startsWith('✅')
 
-      <div
-        style={{
-          maxWidth: 640,
-          margin: '0 auto',
-        }}
-      >
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '2rem',
-            textAlign: 'center',
-            marginBottom: 28,
-          }}
-        >
-          Got Questions? 🙋
-        </h2>
+                    const icon = enabled ? '✅' : '❌'
 
-        {FAQ.map((faq, i) => (
-          <div
-            key={i}
-            className="card"
-            style={{
-              padding: '20px 24px',
-              marginBottom: 12,
-              cursor: 'pointer',
-            }}
-            onClick={() =>
-              setActiveFaq(
-                activeFaq === i ? null : i
-              )
-            }
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <span
-                style={{
-                  fontWeight: 800,
-                }}
-              >
-                {faq.q}
-              </span>
+                    const text = feature
+                      .replace('✅ ', '')
+                      .replace('❌ ', '')
 
-              <span
-                style={{
-                  color: 'var(--brand-orange)',
-                  fontWeight: 900,
-                }}
-              >
-                {activeFaq === i ? '−' : '+'}
-              </span>
-            </div>
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 8,
+                          marginBottom: 10,
+                          opacity: enabled ? 1 : 0.5,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 1.2,
+                            color: enabled 
+                              ? '#06D6A0' 
+                              : '#EF233C',
+                          }}
+                        >
+                          {icon}
+                        </span>
 
-            {activeFaq === i && (
-              <div
-                style={{
-                  marginTop: 12,
-                  color: 'var(--text-secondary)',
-                  fontWeight: 600,
-                  lineHeight: 1.7,
-                }}
-              >
-                {faq.a}
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            color:
+                              'var(--text-secondary)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {text}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <button
+                  className="btn"
+                  onClick={() => handleSelect(plan.id)}
+                  disabled={isCurrent || Boolean(checkoutPlan)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 20px',
+                    borderRadius: '50px',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    transition: 'all 0.2s var(--ease-smooth)',
+                    background: isCurrent
+                      ? 'var(--bg-tertiary)'
+                      : plan.highlight
+                      ? plan.color
+                      : 'white',
+                    color: isCurrent
+                      ? 'var(--text-muted)'
+                      : plan.highlight
+                      ? 'white'
+                      : 'var(--text-primary)',
+                    border: `1px solid ${plan.color}`,
+                  }}
+                >
+                  {isCurrent
+                    ? '✓ Current Plan'
+                    : checkoutPlan === plan.id
+                    ? 'Processing…'
+                    : plan.cta}
+                </button>
+
+                {plan.id !== 'free' && (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      marginTop: 12,
+                      color: 'var(--text-muted)',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    7-day free trial · Cancel anytime
+                  </div>
+                )}
               </div>
-            )}
+            )
+          })}
+        </div>
+
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 48,
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              color: '#FFD23F',
+              fontSize: '2rem',
+              marginBottom: 12,
+            }}
+          >
+            ★★★★★
           </div>
-        ))}
-      </div>
+
+          <p
+            style={{
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              color: 'var(--text-secondary)',
+              maxWidth: 500,
+              margin: '0 auto',
+              lineHeight: 1.7,
+            }}
+          >
+            "StudyStreak transformed my study habits and improved my grades significantly."
+          </p>
+
+          <div
+            style={{
+              marginTop: 12,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            — Alex T., University Student
+          </div>
+        </div>
+
+        <section className="section">
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '2.2rem',
+              textAlign: 'center',
+              marginBottom: 28,
+              color: 'var(--text-primary)',
+            }}
+          >
+            Got Questions? 🙋
+          </h2>
+
+          <div
+            style={{
+              maxWidth: 640,
+              margin: '0 auto',
+            }}
+          >
+            {FAQ.map((faq, i) => (
+              <div
+                key={i}
+                className="glass-card hover-lift"
+                style={{
+                  marginBottom: 12,
+                  overflow: 'hidden',
+                }}
+                onClick={() =>
+                  setActiveFaq(
+                    activeFaq === i ? null : i
+                  )
+                }
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '20px 24px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                    }}
+                  >
+                    {faq.q}
+                  </span>
+
+                  <span
+                    style={{
+                      color: 'var(--brand-primary)',
+                      fontWeight: 800,
+                      fontSize: '1.2rem',
+                      transition: 'transform 0.2s var(--ease-smooth)',
+                      transform: activeFaq === i ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    +
+                  </span>
+                </div>
+
+                {activeFaq === i && (
+                  <div
+                    style={{
+                      padding: '0 24px 20px 24px',
+                      color: 'var(--text-secondary)',
+                      fontWeight: 600,
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </section>
     </div>
   )
 }
