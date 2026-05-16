@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore } from '../store.js'
 
 const MOTIVATIONAL = [
@@ -12,15 +12,32 @@ const MOTIVATIONAL = [
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, currentStreak, longestStreak, xp, level, xpToNextLevel, todayMinutes, weeklyGoal, weeklyMinutes, subjects, activeSubjects, achievements, openPaywall } = useStore()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { user, currentStreak, longestStreak, xp, level, xpToNextLevel, todayMinutes, weeklyGoal, weeklyMinutes, subjects, activeSubjects, achievements, openPaywall, setPlan } = useStore()
   const [quote] = useState(() => MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)])
   const [greeting, setGreeting] = useState('')
   const [celebrated, setCelebrated] = useState(false)
+  const [checkoutMessage, setCheckoutMessage] = useState('')
 
   useEffect(() => {
     const h = new Date().getHours()
     setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
   }, [])
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment')
+    const paidPlan = searchParams.get('plan')
+
+    if (paymentStatus !== 'success' || !['pro', 'premium'].includes(paidPlan)) return
+
+    // Demo-only client update: production apps should confirm payment via webhook/backend.
+    setPlan(paidPlan)
+    setCheckoutMessage(`🎉 ${paidPlan === 'pro' ? 'Pro' : 'Premium'} activated successfully!`)
+
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.delete('payment')
+    nextParams.delete('plan')
+    setSearchParams(nextParams, { replace: true })
+  }, [searchParams, setPlan, setSearchParams])
 
   const xpPct = Math.min(100, Math.round((xp / xpToNextLevel) * 100))
   const weeklyPct = Math.min(100, Math.round((weeklyMinutes / weeklyGoal) * 100))
@@ -28,6 +45,11 @@ export default function Dashboard() {
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto' }}>
+      {checkoutMessage && (
+        <div className="card" style={{ padding: '14px 18px', marginBottom: 18, background: 'rgba(6,214,160,0.12)', borderColor: 'var(--brand-green)' }}>
+          <span style={{ fontWeight: 800, color: '#049E78' }}>{checkoutMessage}</span>
+        </div>
+      )}
       {/* Header */}
       <div style={{ marginBottom: 32, animation: 'slide-up 0.5s ease both' }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', marginBottom: 8 }}>

@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useStore } from '../store.js'
+import { startStripeCheckout } from '../lib/stripeCheckout.js'
 
 const PLANS = [
   {
@@ -101,23 +102,27 @@ export default function Pricing() {
 
   const [billing, setBilling] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(null)
+  const [checkoutPlan, setCheckoutPlan] = useState('')
 
-const handleSelect = async (plan) => {
-  if (plan === 'free') return;
+  useEffect(() => {
+    const billingFromUrl = new URLSearchParams(window.location.search).get('billing')
+    if (billingFromUrl === 'monthly' || billingFromUrl === 'annual') {
+      setBilling(billingFromUrl)
+    }
+  }, [])
 
-  const stripe = await stripePromise;
+  const handleSelect = async (plan) => {
+    if (plan === 'free') return
 
-  const priceId = plan === 'pro' 
-    ? 'price_1TXgQPHU1AxqRSaJNNSYsxDc'   // ← Paste your Pro Price ID here
-    : 'price_1TXgQPHU1AxqRSaJnSB8BtEW';  // ← Paste your Premium Price ID here
+    setCheckoutPlan(plan)
 
-  await stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'subscription',
-    successUrl: `${window.location.origin}/app/dashboard?payment=success`,
-    cancelUrl: `${window.location.origin}/app/pricing`,
-  });
-};
+    const result = await startStripeCheckout({ plan, billing })
+
+    if (!result.ok) {
+      alert(result.message)
+      setCheckoutPlan('')
+    }
+  }
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -350,7 +355,7 @@ const handleSelect = async (plan) => {
               <button
                 className="btn"
                 onClick={() => handleSelect(plan.id)}
-                disabled={isCurrent}
+                disabled={isCurrent || Boolean(checkoutPlan)}
                 style={{
                   width: '100%',
                   justifyContent: 'center',
@@ -368,7 +373,7 @@ const handleSelect = async (plan) => {
                   padding: '14px 18px',
                   borderRadius: 14,
                   fontWeight: 800,
-                  cursor: isCurrent
+                  cursor: (isCurrent || Boolean(checkoutPlan))
                     ? 'default'
                     : 'pointer',
                   fontSize: '0.95rem',
@@ -376,6 +381,8 @@ const handleSelect = async (plan) => {
               >
                 {isCurrent
                   ? '✓ Current Plan'
+                  : checkoutPlan === plan.id
+                  ? 'Redirecting…'
                   : plan.cta}
               </button>
 

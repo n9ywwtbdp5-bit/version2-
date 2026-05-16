@@ -95,14 +95,12 @@ wrangler pages deploy dist --project-name=studystreak
 
 1. Create a [Stripe account](https://stripe.com)
 2. Create two products: Pro ($16.99/mo) and Premium ($23.99/mo)
-3. Install Stripe: `npm install @stripe/stripe-js`
-4. Replace the `handleSelect` placeholder in `Pricing.jsx` with Stripe Checkout:
-
-```js
-import { loadStripe } from '@stripe/stripe-js'
-const stripe = await loadStripe('pk_live_YOUR_KEY')
-await stripe.redirectToCheckout({ lineItems: [{ price: 'price_PRO_ID', quantity: 1 }], mode: 'subscription', successUrl: `${window.location.origin}/app/dashboard`, cancelUrl: `${window.location.origin}/app/pricing` })
-```
+3. Copy `.env.example` to `.env` and set:
+   - `VITE_STRIPE_PUBLIC_KEY`
+   - `VITE_STRIPE_PRICE_PRO_MONTHLY`
+   - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY`
+   - Optional annual IDs: `VITE_STRIPE_PRICE_PRO_ANNUAL`, `VITE_STRIPE_PRICE_PREMIUM_ANNUAL`
+4. Checkout is handled in `src/lib/stripeCheckout.js` and used by both `src/pages/Pricing.jsx` and `src/components/PaywallModal.jsx`
 
 ## 🎨 Design System
 

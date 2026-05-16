@@ -70,8 +70,14 @@ git push -u origin main
    - "StudyStreak Pro" — $16.99/month recurring
    - "StudyStreak Premium" — $23.99/month recurring
 3. Copy the Price IDs (start with `price_`)
-4. In `src/pages/Pricing.jsx`, replace the `handleSelect` function with Stripe Checkout
-5. Add environment variable: `VITE_STRIPE_PUBLIC_KEY=pk_live_xxx`
+4. Copy `.env.example` to `.env`
+5. Add environment variables:
+   - `VITE_STRIPE_PUBLIC_KEY=pk_live_xxx`
+   - `VITE_STRIPE_PRICE_PRO_MONTHLY=price_xxx`
+   - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY=price_xxx`
+   - Optional annual billing IDs:
+     - `VITE_STRIPE_PRICE_PRO_ANNUAL=price_xxx`
+     - `VITE_STRIPE_PRICE_PREMIUM_ANNUAL=price_xxx`
 
 ---
 

@@ -1,16 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store.js'
+import { startStripeCheckout } from '../lib/stripeCheckout.js'
 
 export default function PaywallModal() {
-  const { closePaywall, paywallFeature, setPlan } = useStore()
+  const { closePaywall, paywallFeature } = useStore()
   const navigate = useNavigate()
+  const [checkoutPlan, setCheckoutPlan] = useState('')
 
-  const handleUpgrade = (plan) => {
-    // In production: open Stripe checkout
-    setPlan(plan)
-    closePaywall()
-    alert(`🎉 Welcome to ${plan === 'pro' ? 'Pro' : 'Premium'}! (Stripe checkout would open here in production)`)
+  const handleUpgrade = async (plan) => {
+    setCheckoutPlan(plan)
+    const result = await startStripeCheckout({ plan, billing: 'monthly' })
+
+    if (!result.ok) {
+      alert(result.message)
+      setCheckoutPlan('')
+    }
   }
 
   return (
@@ -38,13 +43,14 @@ export default function PaywallModal() {
         {/* Mini plan cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
           {/* Pro */}
-          <div onClick={() => handleUpgrade('pro')} style={{
+          <div onClick={() => { if (!checkoutPlan) handleUpgrade('pro') }} style={{
             background: 'linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,210,63,0.06))',
-            border: '2.5px solid var(--brand-orange)', borderRadius: 18, padding: 20, cursor: 'pointer',
+            border: '2.5px solid var(--brand-orange)', borderRadius: 18, padding: 20, cursor: checkoutPlan ? 'default' : 'pointer',
             transition: 'transform 0.2s var(--ease-bounce)',
             position: 'relative',
+            opacity: checkoutPlan && checkoutPlan !== 'pro' ? 0.6 : 1,
           }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+            onMouseEnter={(e) => { if (!checkoutPlan) e.currentTarget.style.transform = 'translateY(-3px)' }}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
             <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'var(--brand-orange)', color: 'white', borderRadius: 99, padding: '2px 12px', fontSize: '0.72rem', fontWeight: 900, whiteSpace: 'nowrap' }}>MOST POPULAR</div>
@@ -58,15 +64,21 @@ export default function PaywallModal() {
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{f}</span>
               </div>
             ))}
+            {checkoutPlan === 'pro' && (
+              <div style={{ marginTop: 10, fontSize: '0.78rem', fontWeight: 800, color: 'var(--brand-orange)' }}>
+                Redirecting to checkout…
+              </div>
+            )}
           </div>
 
           {/* Premium */}
-          <div onClick={() => handleUpgrade('premium')} style={{
+          <div onClick={() => { if (!checkoutPlan) handleUpgrade('premium') }} style={{
             background: 'linear-gradient(135deg, rgba(155,93,229,0.08), rgba(247,37,133,0.05))',
-            border: '2.5px solid var(--brand-purple)', borderRadius: 18, padding: 20, cursor: 'pointer',
+            border: '2.5px solid var(--brand-purple)', borderRadius: 18, padding: 20, cursor: checkoutPlan ? 'default' : 'pointer',
             transition: 'transform 0.2s var(--ease-bounce)',
+            opacity: checkoutPlan && checkoutPlan !== 'premium' ? 0.6 : 1,
           }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+            onMouseEnter={(e) => { if (!checkoutPlan) e.currentTarget.style.transform = 'translateY(-3px)' }}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
             <div style={{ fontSize: 28, marginBottom: 8 }}>👑</div>
@@ -79,13 +91,18 @@ export default function PaywallModal() {
                 <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{f}</span>
               </div>
             ))}
+            {checkoutPlan === 'premium' && (
+              <div style={{ marginTop: 10, fontSize: '0.78rem', fontWeight: 800, color: 'var(--brand-purple)' }}>
+                Redirecting to checkout…
+              </div>
+            )}
           </div>
         </div>
 
-        <button className="btn btn-primary" onClick={() => { closePaywall(); navigate('/app/pricing') }} style={{ width: '100%', justifyContent: 'center', fontSize: '1rem' }}>
+        <button className="btn btn-primary" onClick={() => { closePaywall(); navigate('/app/pricing') }} style={{ width: '100%', justifyContent: 'center', fontSize: '1rem' }} disabled={Boolean(checkoutPlan)}>
           See Full Pricing →
         </button>
-        <button onClick={closePaywall} style={{ width: '100%', background: 'none', border: 'none', color: 'var(--text-muted)', fontFamily: 'var(--font-body)', fontWeight: 700, padding: '12px', cursor: 'pointer', fontSize: '0.85rem', marginTop: 4 }}>
+        <button onClick={closePaywall} style={{ width: '100%', background: 'none', border: 'none', color: 'var(--text-muted)', fontFamily: 'var(--font-body)', fontWeight: 700, padding: '12px', cursor: 'pointer', fontSize: '0.85rem', marginTop: 4 }} disabled={Boolean(checkoutPlan)}>
           Maybe later
         </button>
 
