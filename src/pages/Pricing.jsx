@@ -92,12 +92,24 @@ export default function Pricing() {
   const [billing, setBilling] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(null)
 
-  const handleSelect = (planId) => {
-    if (planId === 'free') return
-    // In production this would open Stripe checkout
-    setPlan(planId)
-    alert(`🎉 Welcome to ${planId === 'pro' ? 'Pro' : 'Premium'}! (Stripe checkout would open here)`)
-  }
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC');   // ← put your key here (or use env var)
+
+const handleSelect = async (plan) => {
+  const stripe = await stripePromise;
+
+  const priceId = plan === 'pro' 
+    ? 'price_1TXgQPHU1AxqRSaJNNSYsxDc'     // ← your Pro price ID
+    : 'price_1TXgQPHU1AxqRSaJnSB8BtEW';    // ← your Premium price ID
+
+  await stripe.redirectToCheckout({
+    lineItems: [{ price: priceId, quantity: 1 }],
+    mode: 'subscription',
+    successUrl: `${window.location.origin}/app/dashboard?payment=success`,
+    cancelUrl: `${window.location.origin}/app/pricing`,
+  });
+};
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
