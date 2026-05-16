@@ -102,18 +102,22 @@ export default function Pricing() {
   const [billing, setBilling] = useState('monthly')
   const [activeFaq, setActiveFaq] = useState(null)
 
-  const handleSelect = (plan) => {
-    if (plan === 'free') return
+const handleSelect = async (plan) => {
+  if (plan === 'free') return;
 
-    if (plan === 'pro') {
-      window.open('https://buy.stripe.com/test_14A5kC4rQ2Hj2wE5kk', '_blank')
-      return
-    }
+  const stripe = await stripePromise;
 
-    if (plan === 'premium') {
-      window.open('https://buy.stripe.com/test_5kA3cu7E2c9R4EOdQQ', '_blank')
-    }
-  }
+  const priceId = plan === 'pro' 
+    ? 'price_1TXgQPHU1AxqRSaJNNSYsxDc'   // ← Paste your Pro Price ID here
+    : 'price_1TXgQPHU1AxqRSaJnSB8BtEW';  // ← Paste your Premium Price ID here
+
+  await stripe.redirectToCheckout({
+    lineItems: [{ price: priceId, quantity: 1 }],
+    mode: 'subscription',
+    successUrl: `${window.location.origin}/app/dashboard?payment=success`,
+    cancelUrl: `${window.location.origin}/app/pricing`,
+  });
+};
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
